@@ -1,6 +1,26 @@
+# Byte-compiled / optimised / DLL files
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Testing
 .pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Large generated outputs
 results/checkpoints/
+
+# macOS metadata
 .DS_Store
-*.gif
+
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
