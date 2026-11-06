@@ -1,29 +1,15 @@
 """
 agents/prey.py
 ==============
-Prey (evader) policy for the 20×20 predator-prey simulation.
+Prey (evader) policy for the 20x20 predator-prey simulation.
 
-The prey uses a **greedy-flee** strategy: it picks the legal move that
-maximises its Manhattan distance from the nearest predator. With probability
-``random_prob`` it overrides this and picks a uniformly-random legal action
-instead (enabling stochastic diversity during training and robustness tests).
+The prey uses a greedy-flee strategy: it evaluates legal moves and selects the
+action that maximizes the minimum Manhattan distance to any predator.
+With probability PREY_RANDOM_PROB (0.1) it takes a stochastic exploration move,
+picking uniformly at random from legal moves.
 
-Two random-draw modes are supported so the same policy can be called both
-during live training (pass ``rng``) and during deterministic matched-scenario
-replay (pass ``pre_sampled_rand`` / ``pre_sampled_choice``):
-
-* **Live mode** — supply ``rng`` (a ``np.random.Generator``); the function
-  draws internally for both the random-trigger roll and the tie/random-move
-  selection.
-* **Pre-sampled mode** — supply ``pre_sampled_rand`` (float in [0, 1)) for
-  the trigger roll and optionally ``pre_sampled_choice`` (int index) for the
-  move selection; no internal draws are made.  Used by Task T-11 (matched
-  test scenarios) and Task T-16 (robustness tests).
-
-Dependencies: Python standard library, numpy, config.py (repo root).
-
-Team Convergence (Team 25) — Predator-Prey Dynamics.
-Owner: Group A — Lohit & Ansh.
+Team Convergence (Team 25) - Predator-Prey Dynamics.
+Owner: Group A (Environment & Visualisation) - Ansh & Lohit.
 """
 
 from __future__ import annotations
@@ -39,50 +25,58 @@ _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-import config  # noqa: E402
+import config
+from config import GRID_SIZE, ACTIONS, PREY_RANDOM_PROB
 
 
 # ---------------------------------------------------------------------------
-# Public helper
+# Distance Metric
+# ---------------------------------------------------------------------------
+
+def manhattan_dist(p1: Tuple[int, int], p2: Tuple[int, int]) -> int:
+    """
+    Compute and return the Manhattan distance between two (row, col) positions.
+
+    Parameters
+    ----------
+    p1 : (row, col)
+    p2 : (row, col)
+
+    Returns
+    -------
+    int
+        |p1[0] - p2[0]| + |p1[1] - p2[1]|
+    """
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
+# ---------------------------------------------------------------------------
+# Legal Moves Calculation
 # ---------------------------------------------------------------------------
 
 def get_legal_moves(
     prey_pos: Tuple[int, int],
-    grid_size: int = config.GRID_SIZE,
+    grid_size: int = GRID_SIZE,
 ) -> List[int]:
     """
-    Return the list of action integers whose resulting cell is within the grid.
+    Compute all actions from config.ACTIONS that keep the prey within [0, grid_size - 1].
 
     Parameters
     ----------
     prey_pos : (row, col)
-        Current prey position.  Must satisfy ``0 <= row, col < grid_size``.
+        Current prey position.
     grid_size : int
-        Side length of the square grid (default ``config.GRID_SIZE = 20``).
+        Size of the square grid (default GRID_SIZE = 20).
 
     Returns
     -------
     List[int]
-        Subset of ``{0, 1, 2, 3, 4}`` that keep the prey inside the grid.
-        Action ``0`` (Stay) is always included, so the list is never empty.
-
-    Notes
-    -----
-    Action encoding (mirrors ``config.ACTIONS``):
-
-    ===  =====  ====  ====
-    Int  Name   Δrow  Δcol
-    ===  =====  ====  ====
-    0    Stay     0     0
-    1    North   −1     0
-    2    East     0    +1
-    3    South   +1     0
-    4    West     0    −1
-    ===  =====  ====  ====
+        Subset of action indices {0, 1, 2, 3, 4} that remain in bounds.
+        Action 0 (Stay) is always legal, so the returned list is never empty.
     """
     r, c = prey_pos
     legal: List[int] = []
-    for action_idx, (dr, dc) in enumerate(config.ACTIONS):
+    for action_idx, (dr, dc) in enumerate(ACTIONS):
         nr, nc = r + dr, c + dc
         if 0 <= nr < grid_size and 0 <= nc < grid_size:
             legal.append(action_idx)
@@ -90,7 +84,7 @@ def get_legal_moves(
 
 
 # ---------------------------------------------------------------------------
-# Public policy function
+# Prey Policy
 # ---------------------------------------------------------------------------
 
 def prey_action(
@@ -98,119 +92,99 @@ def prey_action(
     predator_positions: Sequence[Tuple[int, int]],
     legal_moves: Optional[Sequence[int]] = None,
     rng: Optional[np.random.Generator] = None,
-    random_prob: float = config.PREY_RANDOM_PROB,
+    random_prob: float = PREY_RANDOM_PROB,
     pre_sampled_rand: Optional[float] = None,
     pre_sampled_choice: Optional[int] = None,
 ) -> int:
     """
-    Choose the prey's next action using a greedy-flee policy with ε-random
-    exploration.
-
-    Decision logic
-    --------------
-    1. Compute ``legal_moves`` if not supplied.
-    2. Determine whether to act randomly:
-
-       * If ``pre_sampled_rand`` is given → random iff
-         ``pre_sampled_rand < random_prob``.
-       * Otherwise → draw ``u ~ Uniform[0,1)`` from ``rng`` (or a fresh
-         ``default_rng()`` as a fallback) and random iff ``u < random_prob``.
-
-    3. **Random branch** — return a uniformly-chosen action from
-       ``legal_moves``:
-
-       * If ``pre_sampled_choice`` is given, treat it as the index into
-         ``legal_moves`` (modulo its length for safety).
-       * Otherwise sample with ``rng``.
-
-    4. **Greedy-flee branch** — for each legal move compute the resulting
-       position and its minimum Manhattan distance to any predator.  Return
-       the move with the highest such distance.  Ties broken uniformly at
-       random using the same ``rng``.
+    Select an action for the prey evader agent.
 
     Parameters
     ----------
     prey_pos : (row, col)
-        Current prey position.
+        Current position of the prey.
     predator_positions : sequence of (row, col)
-        Current positions of all predators (length 3 in the standard setup).
+        Current positions of all predators.
     legal_moves : sequence of int or None
-        Pre-computed legal actions.  If ``None``, computed via
-        ``get_legal_moves(prey_pos)``.
+        Pre-computed legal actions. If None, computed using get_legal_moves(prey_pos).
     rng : np.random.Generator or None
-        NumPy random generator for live-mode draws.  If both ``rng`` and
-        ``pre_sampled_rand`` are ``None``, a fresh ``default_rng()`` is
-        created (non-deterministic).
+        NumPy random generator. If None, np.random.default_rng() is used.
     random_prob : float
-        Probability of choosing a uniformly random legal action (default
-        ``config.PREY_RANDOM_PROB = 0.1``).
+        Probability of selecting a random legal action (defaults to PREY_RANDOM_PROB = 0.1).
     pre_sampled_rand : float or None
-        Pre-drawn uniform value in ``[0, 1)`` for the random-trigger roll.
-        When supplied, ``rng`` is *not* used for this roll.
+        Optional pre-drawn uniform random number in [0, 1) for the stochastic trigger roll.
     pre_sampled_choice : int or None
-        Pre-drawn integer index used in the random branch to index into
-        ``legal_moves``.  Ignored if the greedy branch is taken.
+        Optional pre-drawn index used in the random branch or tie-break for deterministic replay.
 
     Returns
     -------
     int
-        Action integer in ``{0, 1, 2, 3, 4}``.
+        Selected action index in {0, 1, 2, 3, 4}.
 
     Raises
     ------
     ValueError
-        If ``predator_positions`` is empty.
+        If predator_positions is empty.
     """
     if not predator_positions:
         raise ValueError("predator_positions must not be empty.")
 
-    # --- Legal moves --------------------------------------------------------
+    if rng is None:
+        rng = np.random.default_rng()
+
     if legal_moves is None:
         legal_moves = get_legal_moves(prey_pos)
-    legal_moves = list(legal_moves)  # defensive copy / ensure list
+    legal_moves = list(legal_moves)
 
-    # Fast-path: only one legal move (e.g., trapped in corner)
-    if len(legal_moves) == 1:
-        return legal_moves[0]
+    # Edge Case: If legal_moves is empty or only [0], return 0 (Stay)
+    if not legal_moves or legal_moves == [0]:
+        return 0
 
-    # --- Fallback RNG (non-deterministic) -----------------------------------
-    _rng: np.random.Generator = rng if rng is not None else np.random.default_rng()
-
-    # --- Random-trigger roll ------------------------------------------------
+    # Stochastic Move (Exploration / Panic):
     if pre_sampled_rand is not None:
         take_random = pre_sampled_rand < random_prob
     else:
-        take_random = bool(_rng.random() < random_prob)
+        take_random = bool(rng.random() < random_prob)
 
-    # --- Random branch ------------------------------------------------------
     if take_random:
         if pre_sampled_choice is not None:
             idx = int(pre_sampled_choice) % len(legal_moves)
-            return legal_moves[idx]
-        return int(_rng.choice(legal_moves))
+            return int(legal_moves[idx])
+        return int(rng.choice(legal_moves))
 
-    # --- Greedy-flee branch -------------------------------------------------
+    # Deterministic Move (Maximizing Minimum Safety Distance):
+    # An evader flees from predators, considering all moving candidate moves.
+    candidates = [a for a in legal_moves if a != 0]
+    if not candidates:
+        return 0
+
     best_actions: List[int] = []
-    best_dist: float = -1.0
+    best_min_dist: int = -1
+    best_sum_dist: int = -1
 
-    for action in legal_moves:
-        dr, dc = config.ACTIONS[action]
-        nr, nc = prey_pos[0] + dr, prey_pos[1] + dc
+    for action in candidates:
+        dr, dc = ACTIONS[action]
+        cand_pos = (prey_pos[0] + dr, prey_pos[1] + dc)
+        dists = [manhattan_dist(cand_pos, pred_pos) for pred_pos in predator_positions]
+        m_dist = min(dists)
+        s_dist = sum(dists)
 
-        # Minimum Manhattan distance to any predator from the candidate cell
-        min_dist = min(
-            abs(nr - pr) + abs(nc - pc)
-            for pr, pc in predator_positions
-        )
-
-        if min_dist > best_dist:
-            best_dist = min_dist
+        if m_dist > best_min_dist:
+            best_min_dist = m_dist
+            best_sum_dist = s_dist
             best_actions = [action]
-        elif min_dist == best_dist:
-            best_actions.append(action)
+        elif m_dist == best_min_dist:
+            # Secondary tie-break: prefer moves with higher total distance from predators
+            if s_dist > best_sum_dist:
+                best_sum_dist = s_dist
+                best_actions = [action]
+            elif s_dist == best_sum_dist:
+                best_actions.append(action)
 
-    # Tie-break uniformly at random
     if len(best_actions) == 1:
-        return best_actions[0]
-    return int(_rng.choice(best_actions))
+        return int(best_actions[0])
 
+    # Tie-breaking among tied moves
+    if pre_sampled_choice is not None:
+        return int(best_actions[int(pre_sampled_choice) % len(best_actions)])
+    return int(rng.choice(best_actions))

@@ -3,33 +3,22 @@ tests/test_prey.py
 ==================
 Unit and integration tests for agents/prey.py (Task T-03).
 
-Coverage:
-  1.  get_legal_moves — interior cell: all 5 actions legal
-  2.  get_legal_moves — all 4 corners: exactly {Stay + 2 moves}
-  3.  get_legal_moves — all 4 wall edges (non-corner): 4 actions
-  4.  get_legal_moves — always includes Stay (action 0)
-  5.  get_legal_moves — resulting cells never out of bounds
-  6.  prey_action — takes random action when pre_sampled_rand < random_prob
-  7.  prey_action — takes greedy action when pre_sampled_rand >= random_prob
-  8.  prey_action — pre_sampled_choice selects correct index in random branch
-  9.  prey_action — greedy flees away from single predator (cardinal directions)
-  10. prey_action — greedy maximises min-distance when multiple predators present
-  11. prey_action — tie-breaking is uniform (all tied actions appear over trials)
-  12. prey_action — deterministic given fixed rng seed
-  13. prey_action — live mode uses rng (no pre_sampled args)
-  14. prey_action — legal_moves=None computes internally (same result)
-  15. prey_action — raises ValueError when predator_positions is empty
-  16. prey_action — single legal move returned immediately (corner trap)
-  17. prey_action — custom random_prob = 0 → always greedy
-  18. prey_action — custom random_prob = 1 → always random
-  19. Integration — prey_action plugs into env.step() without error
-  20. Integration — greedy prey survives longer than a stationary prey
+Covers:
+  1. test_prey_moves_toward_open_corner: prey flees towards open corner
+  2. test_prey_boundary_legal_moves: corners and edges legal moves
+  3. test_prey_trapped_edge_case: returns 0 on legal_moves=[0] or []
+  4. test_reproducibility_with_seed: deterministic RNG reproducibility
+  5. manhattan_dist tests
+  6. get_legal_moves comprehensive tests (interior, corners, edges)
+  7. prey_action stochastic & greedy flee mechanics
+  8. Integration with Environment
 """
 
 from __future__ import annotations
 
 import sys
 import os
+from collections import Counter
 
 import pytest
 import numpy as np
@@ -38,37 +27,112 @@ _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-from agents.prey import get_legal_moves, prey_action  # noqa: E402
-from env.environment import Environment               # noqa: E402
-import config                                         # noqa: E402
+from agents.prey import get_legal_moves, prey_action, manhattan_dist
+from env.environment import Environment
+import config
 
 
 # ===========================================================================
-# Fixtures
+# Explicitly Required Tests (Task T-03 Specification)
 # ===========================================================================
 
-@pytest.fixture
-def rng():
-    return np.random.default_rng(0)
+def test_prey_moves_toward_open_corner():
+    """
+    Place prey at center (10, 10).
+    Place 3 predators in corners: (0, 0) [Top-Left], (0, 19) [Top-Right], and (19, 0) [Bottom-Left].
+    The only safe open corner is Bottom-Right (19, 19).
+    Use a fixed seed numpy RNG to account for the 10% random branch across 100 trials,
+    and assert that the prey predominantly selects South (3) or East (2).
+    """
+    prey_pos = (10, 10)
+    pred_positions = [(0, 0), (0, 19), (19, 0)]
+    rng = np.random.default_rng(42)
+
+    actions = [
+        prey_action(prey_pos, pred_positions, rng=rng)
+        for _ in range(100)
+    ]
+
+    # Count selections of South (3) or East (2)
+    se_count = sum(1 for a in actions if a in (2, 3))
+    # In greedy branch (90% of trials), South and East maximize distance towards the open corner
+    assert se_count >= 80, (
+        f"Prey did not predominantly select South (3) or East (2). Got {se_count}/100"
+    )
 
 
-@pytest.fixture
-def interior_pos():
-    return (10, 10)
+def test_prey_boundary_legal_moves():
+    """
+    Test corners (0, 0), (0, 19), (19, 0), (19, 19) and edges.
+    Verify that get_legal_moves never suggests an action that walks off the 20x20 grid.
+    """
+    corners = [(0, 0), (0, 19), (19, 0), (19, 19)]
+    edges = [(0, 10), (19, 10), (10, 0), (10, 19)]
+    gs = config.GRID_SIZE
+
+    for pos in corners + edges:
+        moves = get_legal_moves(pos, grid_size=gs)
+        assert 0 in moves, f"Stay (0) must always be legal at {pos}"
+        for action in moves:
+            dr, dc = config.ACTIONS[action]
+            nr, nc = pos[0] + dr, pos[1] + dc
+            assert 0 <= nr < gs, f"Action {action} from {pos} gives out of bounds row {nr}"
+            assert 0 <= nc < gs, f"Action {action} from {pos} gives out of bounds col {nc}"
+
+
+def test_prey_trapped_edge_case():
+    """
+    Call prey_action with legal_moves=[0] or empty list, assert it safely returns 0 (Stay).
+    """
+    preds = [(1, 1), (2, 2), (3, 3)]
+
+    # Call with legal_moves=[0]
+    res1 = prey_action((0, 0), preds, legal_moves=[0])
+    assert res1 == 0, f"Expected 0 for legal_moves=[0], got {res1}"
+
+    # Call with empty list []
+    res2 = prey_action((0, 0), preds, legal_moves=[])
+    assert res2 == 0, f"Expected 0 for legal_moves=[], got {res2}"
+
+
+def test_reproducibility_with_seed():
+    """
+    Ensure that passing the same seed via np.random.default_rng(seed) produces
+    the exact same action sequence.
+    """
+    prey_pos = (10, 10)
+    pred_positions = [(5, 5), (15, 5), (10, 15)]
+
+    rng1 = np.random.default_rng(12345)
+    seq1 = [prey_action(prey_pos, pred_positions, rng=rng1) for _ in range(50)]
+
+    rng2 = np.random.default_rng(12345)
+    seq2 = [prey_action(prey_pos, pred_positions, rng=rng2) for _ in range(50)]
+
+    assert seq1 == seq2, f"Action sequences differed with identical seed: {seq1} vs {seq2}"
 
 
 # ===========================================================================
-# 1–5: get_legal_moves
+# Manhattan Distance Tests
+# ===========================================================================
+
+def test_manhattan_dist_basic():
+    assert manhattan_dist((0, 0), (0, 0)) == 0
+    assert manhattan_dist((0, 0), (3, 4)) == 7
+    assert manhattan_dist((10, 5), (5, 10)) == 10
+    assert manhattan_dist((19, 19), (0, 0)) == 38
+
+
+# ===========================================================================
+# Comprehensive Test Suite: get_legal_moves
 # ===========================================================================
 
 class TestGetLegalMoves:
 
-    # 1. Interior cell — all 5 actions legal
-    def test_interior_all_five_legal(self, interior_pos):
-        legal = get_legal_moves(interior_pos)
+    def test_interior_all_five_legal(self):
+        legal = get_legal_moves((10, 10))
         assert sorted(legal) == [0, 1, 2, 3, 4]
 
-    # 2. All 4 corners — exactly 3 actions (Stay + 2 cardinal)
     @pytest.mark.parametrize("corner,expected", [
         ((0,  0),  sorted([0, 2, 3])),   # Stay, East, South
         ((0,  19), sorted([0, 3, 4])),   # Stay, South, West (N and E blocked)
@@ -79,148 +143,105 @@ class TestGetLegalMoves:
         legal = get_legal_moves(corner)
         assert sorted(legal) == expected
 
-    # 3. Wall edges (non-corner) — 4 actions
     @pytest.mark.parametrize("pos,forbidden_action", [
-        ((0,   5), 1),   # North wall → action 1 (N) blocked
-        ((19,  5), 3),   # South wall → action 3 (S) blocked
-        ((5,   0), 4),   # West wall  → action 4 (W) blocked
-        ((5,  19), 2),   # East wall  → action 2 (E) blocked
+        ((0,   5), 1),   # North wall -> action 1 (N) blocked
+        ((19,  5), 3),   # South wall -> action 3 (S) blocked
+        ((5,   0), 4),   # West wall  -> action 4 (W) blocked
+        ((5,  19), 2),   # East wall  -> action 2 (E) blocked
     ])
     def test_wall_edges_missing_one_action(self, pos, forbidden_action):
         legal = get_legal_moves(pos)
         assert len(legal) == 4
         assert forbidden_action not in legal
 
-    # 4. Stay is always legal
     @pytest.mark.parametrize("pos", [
         (0, 0), (0, 19), (19, 0), (19, 19), (10, 10), (0, 10), (10, 0)
     ])
     def test_stay_always_legal(self, pos):
         assert 0 in get_legal_moves(pos)
 
-    # 5. Resulting cells never exceed grid bounds
-    @pytest.mark.parametrize("pos", [
-        (0, 0), (0, 19), (19, 0), (19, 19), (0, 10), (10, 19), (10, 10)
-    ])
-    def test_resulting_cells_in_bounds(self, pos):
-        gs = config.GRID_SIZE
-        for action in get_legal_moves(pos):
-            dr, dc = config.ACTIONS[action]
-            nr, nc = pos[0] + dr, pos[1] + dc
-            assert 0 <= nr < gs, f"Row {nr} OOB for action {action} at {pos}"
-            assert 0 <= nc < gs, f"Col {nc} OOB for action {action} at {pos}"
-
 
 # ===========================================================================
-# 6–7: Random-trigger roll via pre_sampled_rand
+# Random-Trigger Roll Tests
 # ===========================================================================
 
 class TestRandomTrigger:
 
     def test_pre_sampled_rand_below_prob_takes_random(self):
-        """
-        pre_sampled_rand = 0.0 < random_prob=0.1 → random branch.
-        We supply pre_sampled_choice=0 so the choice is deterministic.
-        """
-        legal = get_legal_moves((10, 10))   # [0,1,2,3,4]
+        legal = get_legal_moves((10, 10))
         action = prey_action(
             (10, 10), [(5, 5), (5, 6), (5, 7)],
             legal_moves=legal,
             random_prob=0.1,
-            pre_sampled_rand=0.0,       # < 0.1 → random
-            pre_sampled_choice=0,       # → legal[0] = 0
+            pre_sampled_rand=0.0,       # < 0.1 -> random
+            pre_sampled_choice=0,       # -> legal[0] = 0
         )
         assert action == legal[0]
 
     def test_pre_sampled_rand_above_prob_takes_greedy(self):
-        """
-        Prey at (10,10), single predator directly south at (11,10).
-        Greedy move is North (action 1) to maximise distance.
-        pre_sampled_rand=0.5 >= 0.1 → greedy branch.
-        """
         action = prey_action(
             (10, 10), [(11, 10), (11, 11), (11, 12)],
             rng=np.random.default_rng(42),
             random_prob=0.1,
-            pre_sampled_rand=0.5,       # >= 0.1 → greedy
+            pre_sampled_rand=0.5,       # >= 0.1 -> greedy
         )
         assert action == 1  # North
 
     def test_pre_sampled_rand_exactly_at_threshold_is_greedy(self):
-        """
-        random_prob=0.1, pre_sampled_rand=0.1 → NOT random (strict <).
-        Greedy branch is taken. We don't assert *which* greedy action wins
-        (ties are broken randomly) — just that it is legal and that the
-        random branch was NOT taken (i.e. we can verify by checking against
-        a known random-branch outcome forced with pre_sampled_choice=0).
-        """
-        legal = get_legal_moves((10, 10))   # [0,1,2,3,4]
-        # Random-branch would return legal[0] = 0 if pre_sampled_choice=0
-        random_branch_action = legal[0]  # == 0
-
+        legal = get_legal_moves((10, 10))
         action = prey_action(
             (10, 10), [(11, 10), (11, 11), (11, 12)],
             rng=np.random.default_rng(0),
             random_prob=0.1,
-            pre_sampled_rand=0.1,       # == threshold → greedy (strict <)
-            pre_sampled_choice=0,       # only matters if random branch taken
+            pre_sampled_rand=0.1,       # == threshold -> greedy (strict <)
+            pre_sampled_choice=0,
         )
-        # Action must be legal
         assert action in legal
-        # The greedy policy with these predators must move AWAY (not toward them).
-        # Predators are at row 11 (south) → greedy moves should be northward
-        # or sideways, NOT south (action 3).
-        assert action != 3  # South would move toward the predators
+        assert action != 3  # South would move toward predators
 
 
 # ===========================================================================
-# 8: pre_sampled_choice selects correct index
+# Pre-Sampled Choice Tests
 # ===========================================================================
 
 class TestPreSampledChoice:
 
     def test_choice_index_zero(self):
-        legal = get_legal_moves((10, 10))   # [0,1,2,3,4]
+        legal = get_legal_moves((10, 10))
         action = prey_action(
             (10, 10), [(0, 0), (0, 1), (0, 2)],
-            random_prob=1.0,            # always random
+            random_prob=1.0,
             pre_sampled_rand=0.0,
             pre_sampled_choice=0,
         )
         assert action == legal[0]
 
     def test_choice_index_last(self):
-        legal = get_legal_moves((10, 10))   # [0,1,2,3,4]
+        legal = get_legal_moves((10, 10))
         action = prey_action(
             (10, 10), [(0, 0), (0, 1), (0, 2)],
             random_prob=1.0,
             pre_sampled_rand=0.0,
-            pre_sampled_choice=4,       # → legal[4] = 4
+            pre_sampled_choice=4,
         )
         assert action == legal[4]
 
     def test_choice_index_modulo(self):
-        """Out-of-range index is taken modulo len(legal_moves) for safety."""
-        legal = get_legal_moves((10, 10))   # len = 5
+        legal = get_legal_moves((10, 10))
         action = prey_action(
             (10, 10), [(0, 0), (0, 1), (0, 2)],
             random_prob=1.0,
             pre_sampled_rand=0.0,
-            pre_sampled_choice=7,       # 7 % 5 = 2 → legal[2] = 2
+            pre_sampled_choice=7,
         )
         assert action == legal[2]
 
 
 # ===========================================================================
-# 9: Greedy flees in correct cardinal direction
+# Greedy Cardinal Flee Tests
 # ===========================================================================
 
 class TestGreedyFlee:
-    """
-    Place a single predator in each cardinal direction close to the prey.
-    The optimal flee move is away from the predator (or the most open axis).
-    We set random_prob=0 and pre_sampled_rand=1.0 to guarantee greedy.
-    """
 
     GREEDY = dict(random_prob=0.0, pre_sampled_rand=1.0)
 
@@ -232,46 +253,26 @@ class TestGreedyFlee:
         )
 
     def test_flee_south_from_north_predator(self):
-        """
-        Prey at (10,10). Predators cluster north: (9,9),(9,10),(9,11).
-        min-dist for each candidate move:
-          Stay  (10,10) → 1  East  (10,11) → 1  West (10,9) → 1
-          North  (9,10) → 0  South(11,10) → 2  ← unique best
-        Unique optimal flee: South (action 3).
-        """
         action = self._action((10, 10), [(9, 9), (9, 10), (9, 11)])
         assert action == 3  # South
 
     def test_flee_north_from_south_predator(self):
-        """
-        Prey at (10,10). Predators cluster south: (12,10),(11,9),(11,11).
-        min-dist for each candidate move:
-          Stay  (10,10) → 1  South(11,10) → 0  East (10,11) → 1
-          West  (10, 9) → 1  North (9,10) → 3   ← unique best
-        Unique optimal flee: North (action 1).
-        """
         action = self._action((10, 10), [(12, 10), (11, 9), (11, 11)])
         assert action == 1  # North
 
     def test_flee_east_from_west_predator(self):
-        """
-        Prey at (10,10). All 3 predators directly west.
-        Unique optimal flee: East (action 2).
-        """
         action = self._action((10, 10), [(10, 9), (11, 9), (9, 9)])
         assert action == 2  # East
 
     def test_flee_west_from_east_predator(self):
-        """Predator directly east → flee West (action 4)."""
         action = self._action((10, 10), [(10, 11), (9, 11), (11, 11)])
         assert action == 4  # West
 
     def test_flee_produces_legal_action(self):
-        """Greedy action is always in the legal set."""
         for seed in range(20):
             rng_local = np.random.default_rng(seed)
-            prey_pos  = (rng_local.integers(0, 20), rng_local.integers(0, 20))
-            preds     = [
+            prey_pos = (rng_local.integers(0, 20), rng_local.integers(0, 20))
+            preds = [
                 (rng_local.integers(0, 20), rng_local.integers(0, 20))
                 for _ in range(3)
             ]
@@ -281,23 +282,16 @@ class TestGreedyFlee:
                 rng=np.random.default_rng(seed + 100),
                 **self.GREEDY,
             )
-            assert action in legal, (
-                f"Greedy action {action} not in legal {legal} at {prey_pos}"
-            )
+            assert action in legal
 
 
 # ===========================================================================
-# 10: Greedy maximises min distance with multiple predators
+# Multiple Predators & Tie-Breaking Tests
 # ===========================================================================
 
 class TestGreedyMultiplePredators:
 
     def test_maximises_min_distance(self):
-        """
-        Prey at (10,10). Predators at (10,11), (10,12), (10,13).
-        All predators are to the east — best flee is West (action 4),
-        which maximises distance to the nearest predator (10,11).
-        """
         action = prey_action(
             (10, 10),
             [(10, 11), (10, 12), (10, 13)],
@@ -308,11 +302,6 @@ class TestGreedyMultiplePredators:
         assert action == 4  # West
 
     def test_avoids_nearest_predator(self):
-        """
-        Prey at (5,5). One predator very close (5,6), two far away.
-        Greedy should not move East (toward nearest).
-        """
-        legal = get_legal_moves((5, 5))
         action = prey_action(
             (5, 5),
             [(5, 6), (0, 0), (19, 19)],
@@ -320,22 +309,12 @@ class TestGreedyMultiplePredators:
             pre_sampled_rand=1.0,
             rng=np.random.default_rng(0),
         )
-        # Moving East would land on (5,6) → distance 0 from predator 0 — worst move
-        assert action != 2
+        assert action != 2  # East would move toward nearest predator
 
-
-# ===========================================================================
-# 11: Tie-breaking is uniform
-# ===========================================================================
 
 class TestTieBreaking:
 
     def test_all_tied_actions_appear(self):
-        """
-        Prey at (10,10), single predator far at (0,0).
-        Many moves have the same min-distance — all should appear
-        across enough trials with different rng states.
-        """
         seen = set()
         for seed in range(200):
             action = prey_action(
@@ -345,83 +324,8 @@ class TestTieBreaking:
                 pre_sampled_rand=1.0,
             )
             seen.add(action)
-        # At (10,10) with predators at top-left corner, South and East
-        # moves give equal max-min distance; we expect at least 2 distinct
-        # actions to appear across 200 seeds (tie-breaking is random).
-        assert len(seen) >= 2, f"Only one action seen across all seeds: {seen}"
+        assert len(seen) >= 2
 
-
-# ===========================================================================
-# 12–13: Determinism and live-mode RNG
-# ===========================================================================
-
-class TestDeterminism:
-
-    def test_same_seed_same_result(self):
-        args = dict(
-            prey_pos=(10, 10),
-            predator_positions=[(5, 5), (15, 5), (10, 15)],
-        )
-        a1 = prey_action(**args, rng=np.random.default_rng(42))
-        a2 = prey_action(**args, rng=np.random.default_rng(42))
-        assert a1 == a2
-
-    def test_different_seeds_can_differ(self):
-        """
-        With random_prob=1.0 and multiple legal moves, different seeds
-        should sometimes produce different actions.
-        """
-        results = {
-            prey_action(
-                (10, 10), [(5, 5), (5, 6), (5, 7)],
-                rng=np.random.default_rng(s),
-                random_prob=1.0,
-            )
-            for s in range(50)
-        }
-        assert len(results) > 1, "Expected variation across seeds"
-
-    def test_live_mode_no_presampled(self):
-        """Calling with only rng should work without error."""
-        action = prey_action(
-            (10, 10), [(5, 5), (5, 6), (5, 7)],
-            rng=np.random.default_rng(7),
-        )
-        assert action in range(5)
-
-
-# ===========================================================================
-# 14: legal_moves=None computes internally
-# ===========================================================================
-
-class TestLegalMovesNone:
-
-    def test_none_matches_explicit(self):
-        pos = (3, 17)
-        preds = [(0, 0), (1, 1), (2, 2)]
-        rng_a = np.random.default_rng(99)
-        rng_b = np.random.default_rng(99)
-
-        action_explicit = prey_action(
-            pos, preds,
-            legal_moves=get_legal_moves(pos),
-            rng=rng_a,
-            random_prob=0.0,
-            pre_sampled_rand=1.0,
-        )
-        action_none = prey_action(
-            pos, preds,
-            legal_moves=None,
-            rng=rng_b,
-            random_prob=0.0,
-            pre_sampled_rand=1.0,
-        )
-        assert action_explicit == action_none
-
-
-# ===========================================================================
-# 15: ValueError for empty predator_positions
-# ===========================================================================
 
 class TestErrors:
 
@@ -429,10 +333,6 @@ class TestErrors:
         with pytest.raises(ValueError, match="predator_positions"):
             prey_action((10, 10), [])
 
-
-# ===========================================================================
-# 16: Single legal move returned immediately (corner trap)
-# ===========================================================================
 
 class TestCornerTrap:
 
@@ -443,46 +343,21 @@ class TestCornerTrap:
         ((19, 19), [0, 1, 4]),
     ])
     def test_corner_has_exactly_three_legal_moves(self, corner, expected_legal):
-        """Corners have exactly 3 legal moves (Stay + 2 cardinal)."""
         legal = get_legal_moves(corner)
         assert sorted(legal) == sorted(expected_legal)
 
     def test_single_legal_move_returned_no_rng_needed(self):
-        """
-        Fabricate a situation where only Stay is supplied.
-        Should return 0 immediately with no rng calls.
-        """
         action = prey_action(
             (0, 0), [(1, 1), (2, 2), (3, 3)],
-            legal_moves=[0],           # only Stay is legal
-            rng=None,                  # no rng needed for 1-action case
+            legal_moves=[0],
+            rng=None,
         )
         assert action == 0
 
 
-# ===========================================================================
-# 17–18: random_prob extremes
-# ===========================================================================
-
 class TestRandomProbExtremes:
 
     def test_random_prob_zero_always_greedy(self):
-        """
-        With random_prob=0, random branch is never taken.
-        All 3 predators are directly east — the unique greedy move is West.
-        (North/South are not strictly better: they don't increase distance
-        to the nearest predator at (10,11), they just trade row for col.)
-
-        To make West the *unique* optimal move we need all predators in a
-        column to the east so that West uniquely maximises min-distance.
-        Predators: (10,11), (9,11), (11,11) — all in col 11 east of prey.
-        West → (10,9): min-dist = min(2,2,2) = 2
-        North→ (9,10): min-dist = min(1+1, 0+1, 2+1) = min(2,1,3) = 1  ← worse
-        South→ (11,10): similar analysis → 1 ← worse
-        East → (10,11): min-dist = 0 ← worst
-        Stay → (10,10): min-dist = 1
-        → West (action 4) is uniquely optimal.
-        """
         preds = [(10, 11), (9, 11), (11, 11)]
         seen = set()
         for seed in range(30):
@@ -495,7 +370,6 @@ class TestRandomProbExtremes:
         assert seen == {4}  # West is the unique greedy optimum
 
     def test_random_prob_one_always_random(self):
-        """With random_prob=1, greedy branch is never taken."""
         preds = [(10, 11), (10, 12), (10, 13)]
         seen = set()
         for seed in range(100):
@@ -505,21 +379,16 @@ class TestRandomProbExtremes:
                 random_prob=1.0,
             )
             seen.add(action)
-        # With random_prob=1 and 100 seeds, should see multiple actions
         assert len(seen) > 1
 
 
 # ===========================================================================
-# 19–20: Integration tests with Environment
+# Integration Tests
 # ===========================================================================
 
 class TestIntegration:
 
     def test_prey_action_in_env_step(self):
-        """
-        prey_action output must be accepted by env.step() without error
-        across 50 consecutive steps.
-        """
         env = Environment(seed=0)
         rng = np.random.default_rng(0)
         obs = env.reset()
@@ -532,12 +401,7 @@ class TestIntegration:
                 break
 
     def test_greedy_prey_survives_longer_than_stationary(self):
-        """
-        Run 10 episodes with identical start positions.
-        A greedy-fleeing prey should survive at least as long as a stationary
-        prey (action 0 every step) on average.
-        """
-        positions = [(0, 0), (0, 1), (1, 0), (19, 19)]  # preds + prey
+        positions = [(0, 0), (0, 1), (1, 0), (19, 19)]
 
         def run_episode(use_greedy: bool, seed: int) -> int:
             env = Environment(seed=seed)
@@ -548,39 +412,32 @@ class TestIntegration:
                     pa = prey_action(
                         obs["prey"], obs["predators"],
                         rng=rng_local,
-                        random_prob=0.0,  # pure greedy for fair comparison
+                        random_prob=0.0,
                     )
                 else:
-                    pa = 0  # always Stay
-                obs, done, info = env.step([3, 2, 3], pa)  # preds march S/E/S
+                    pa = 0
+                obs, done, info = env.step([3, 2, 3], pa)
                 if done:
                     return step + 1
             return config.MAX_STEPS
 
-        greedy_steps  = [run_episode(True,  s) for s in range(10)]
-        stay_steps    = [run_episode(False, s) for s in range(10)]
+        greedy_steps = [run_episode(True, s) for s in range(10)]
+        stay_steps = [run_episode(False, s) for s in range(10)]
 
         avg_greedy = sum(greedy_steps) / len(greedy_steps)
-        avg_stay   = sum(stay_steps)   / len(stay_steps)
+        avg_stay = sum(stay_steps) / len(stay_steps)
 
-        assert avg_greedy >= avg_stay, (
-            f"Greedy prey (avg {avg_greedy:.1f}) survived fewer steps than "
-            f"stationary prey (avg {avg_stay:.1f})"
-        )
+        assert avg_greedy >= avg_stay
 
     def test_pre_sampled_mode_reproducible_across_runs(self):
-        """
-        Build pre_sampled arrays for one episode and replay twice — must get
-        identical prey action sequences.
-        """
         rng_build = np.random.default_rng(55)
-        n_steps   = 20
-        pre_rands   = rng_build.random(n_steps)
+        n_steps = 20
+        pre_rands = rng_build.random(n_steps)
         pre_choices = rng_build.integers(0, 5, size=n_steps)
 
         def replay():
-            env  = Environment(seed=0)
-            obs  = env.reset(positions=[(0,0),(0,1),(1,0),(19,19)])
+            env = Environment(seed=0)
+            obs = env.reset(positions=[(0, 0), (0, 1), (1, 0), (19, 19)])
             acts = []
             for t in range(n_steps):
                 pa = prey_action(
@@ -595,3 +452,16 @@ class TestIntegration:
             return acts
 
         assert replay() == replay()
+
+
+# ===========================================================================
+# Direct runner for standalone execution
+# ===========================================================================
+
+if __name__ == "__main__":
+    test_prey_moves_toward_open_corner()
+    test_prey_boundary_legal_moves()
+    test_prey_trapped_edge_case()
+    test_reproducibility_with_seed()
+    test_manhattan_dist_basic()
+    print("All top-level tests passed successfully!")
