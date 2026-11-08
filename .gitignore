@@ -13,6 +13,7 @@ venv/
 
 # Large generated outputs
 results/checkpoints/
+results/*/checkpoints/
 
 # macOS metadata
 .DS_Store
