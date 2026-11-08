@@ -1,0 +1,13 @@
+{
+  "seed": 1,
+  "run_name": "full",
+  "obs": "full",
+  "shaped": true,
+  "episodes": 10000,
+  "best_episode": 6500,
+  "best_val_success_rate": 0.96,
+  "best_val_mean_time": 98.02,
+  "alpha": 0.2,
+  "gamma": 0.99,
+  "train_seconds": 205.2
+}
