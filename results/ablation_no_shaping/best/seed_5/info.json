@@ -1,0 +1,13 @@
+{
+  "seed": 5,
+  "run_name": "ablation_no_shaping",
+  "obs": "full",
+  "shaped": false,
+  "episodes": 10000,
+  "best_episode": 8500,
+  "best_val_success_rate": 0.9,
+  "best_val_mean_time": 132.56,
+  "alpha": 0.2,
+  "gamma": 0.99,
+  "train_seconds": 365.5
+}
