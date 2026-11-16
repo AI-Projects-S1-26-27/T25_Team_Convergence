@@ -1,54 +1,76 @@
-"""Coordinated pursuit baseline for the predator-prey grid world."""
+"""
+baselines/coordinated_pursuit.py  (Task T-06 — Baseline 3: Coordinated Pursuit)
+===============================================================================
+Rule (proposal, Section 4):
+    "Assign predators to distinct targets among the projected prey cell and its
+     legal adjacent cells, minimizing total travel distance; each moves toward
+     its assigned target."
+
+Each turn:
+  1. Candidates — the prey's projected cell 2 turns ahead (same projection as
+     Predictive Interception) plus its in-bounds N/E/S/W neighbours.
+     That is 5 cells in the open, 4 on an edge, 3 in a corner — always >= 3.
+  2. Assignment — try every way of giving the 3 predators 3 DIFFERENT
+     candidates (at most 5*4*3 = 60 ways). Keep the one with the smallest total
+     Manhattan distance. Ties are broken at random with the policy's seeded RNG.
+     (Brute force; equivalent to the Hungarian algorithm at this size.)
+  3. Movement — each predator takes one greedy step toward its own target.
+
+This file replaces an earlier stand-in version written by Group C (which used the
+work-division doc's "projected cell + widest adjacent pair" targets); the team chose
+the proposal's rule above as the official Coordinated Pursuit. The old class name
+`CoordinatedPursuitPolicy` is kept as an alias (see the bottom of this file).
+
+This is the only baseline with explicit role assignment: predators never share
+a target, so they stop stacking on the same cell. It does not force them to
+spread around all four sides — if all three approach from the west they take
+the three western-most candidates.
+"""
 
 from __future__ import annotations
 
-import itertools
-from typing import Optional, Sequence, Tuple
+from itertools import permutations
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 
 import config
-
-Pos = Tuple[int, int]
-
-
-def _projected_prey(prey: Pos, previous_prey: Optional[Pos]) -> Pos:
-    if previous_prey is None:
-        return prey
-    dy, dx = prey[0] - previous_prey[0], prey[1] - previous_prey[1]
-    return (
-        min(config.GRID_SIZE - 1, max(0, prey[0] + 2 * dy)),
-        min(config.GRID_SIZE - 1, max(0, prey[1] + 2 * dx)),
-    )
+from baselines.common import BaselinePolicy, Pos, apply_action, legal_actions, manhattan, step_toward
+from baselines.predictive_interception import project_prey
 
 
-def _targets(prey: Pos, previous_prey: Optional[Pos]) -> list[Pos]:
-    """Projected prey cell plus the widest valid pair of adjacent cells."""
-    target = _projected_prey(prey, previous_prey)
-    r, c = target
-    adjacent = []
-    for dr, dc in config.ACTIONS[1:]:
-        cell = (r + dr, c + dc)
-        if 0 <= cell[0] < config.GRID_SIZE and 0 <= cell[1] < config.GRID_SIZE:
-            adjacent.append(cell)
-    # At every grid position there are at least two distinct valid neighbors.
-    pair = max(itertools.combinations(adjacent, 2), key=lambda xy: _manhattan(*xy))
-    return [target, pair[0], pair[1]]
+def candidate_targets(center: Pos, grid_size: int = config.GRID_SIZE) -> List[Pos]:
+    """The projected cell followed by its in-bounds N/E/S/W neighbours."""
+    return [apply_action(center, a) for a in legal_actions(center, grid_size)]  # Stay first
 
 
-def _manhattan(a: Pos, b: Pos) -> int:
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+def assign_targets(
+    predator_positions: Sequence[Pos],
+    candidates: Sequence[Pos],
+    rng: np.random.Generator,
+) -> List[Pos]:
+    """Distinct target per predator, minimising total Manhattan distance."""
+    best: List[Tuple[Pos, ...]] = []
+    best_cost: Optional[int] = None
+    for combo in permutations(candidates, len(predator_positions)):
+        cost = sum(manhattan(p, t) for p, t in zip(predator_positions, combo))
+        if best_cost is None or cost < best_cost:
+            best, best_cost = [combo], cost
+        elif cost == best_cost:
+            best.append(combo)
+    chosen = best[0] if len(best) == 1 else best[int(rng.integers(len(best)))]
+    return list(chosen)
 
 
-def _move_toward(position: Pos, target: Pos, rng: np.random.Generator) -> int:
-    distances = []
-    for action, (dr, dc) in enumerate(config.ACTIONS):
-        candidate = (position[0] + dr, position[1] + dc)
-        if not (0 <= candidate[0] < config.GRID_SIZE and 0 <= candidate[1] < config.GRID_SIZE):
-            candidate = position
-        distances.append(_manhattan(candidate, target))
-    best = np.flatnonzero(np.asarray(distances) == min(distances))
-    return int(rng.choice(best))
+def coordinated_targets(
+    predator_positions: Sequence[Pos],
+    prey_position: Pos,
+    prev_prey_position: Optional[Pos],
+    rng: np.random.Generator,
+) -> List[Pos]:
+    """Steps 1+2: the target cell assigned to each predator this turn."""
+    center = project_prey(prey_position, prev_prey_position)
+    return assign_targets(predator_positions, candidate_targets(center), rng)
 
 
 def coordinated_pursuit_actions(
@@ -56,33 +78,28 @@ def coordinated_pursuit_actions(
     prey_position: Pos,
     prev_prey_position: Optional[Pos] = None,
     rng: Optional[np.random.Generator] = None,
-) -> list[int]:
-    """Assign distinct surround targets to three predators, then move greedily."""
+) -> List[int]:
+    """Steps 1-3: one greedy step toward each predator's assigned target."""
     if len(predator_positions) != config.NUM_PREDATORS:
         raise ValueError(f"expected {config.NUM_PREDATORS} predator positions")
-    rng = rng or np.random.default_rng(0)
-    targets = _targets(prey_position, prev_prey_position)
-    assignment = min(
-        itertools.permutations(range(config.NUM_PREDATORS)),
-        key=lambda order: sum(_manhattan(predator_positions[i], targets[order[i]]) for i in range(config.NUM_PREDATORS)),
-    )
-    return [
-        _move_toward(predator_positions[i], targets[assignment[i]], rng)
-        for i in range(config.NUM_PREDATORS)
-    ]
+    if rng is None:
+        rng = np.random.default_rng(0)
+    targets = coordinated_targets(predator_positions, prey_position, prev_prey_position, rng)
+    return [step_toward(p, t, rng) for p, t in zip(predator_positions, targets)]
 
 
-class CoordinatedPursuitPolicy:
-    """Evaluator-compatible wrapper with reproducible tie breaking."""
+class CoordinatedPursuit(BaselinePolicy):
+    """Baseline 3. Distinct targets around the projected prey cell, cheapest total travel."""
 
-    def __init__(self, seed: int = 0) -> None:
-        self._seed = seed
-        self.reset(seed)
+    name = "coordinated_pursuit"
 
-    def reset(self, seed: Optional[int] = None) -> None:
-        self.rng = np.random.default_rng(self._seed if seed is None else seed)
+    def choose_actions(
+        self, predators: Sequence[Pos], prey: Pos, prev_prey: Optional[Pos]
+    ) -> List[int]:
+        return coordinated_pursuit_actions(predators, prey, prev_prey, self.rng)
 
-    def __call__(self, env_obs: dict) -> list[int]:
-        return coordinated_pursuit_actions(
-            env_obs["predators"], env_obs["prey"], env_obs.get("prev_prey"), self.rng
-        )
+
+# Compatibility name: Group C's experiments/run_remaining_evaluations.py imports
+# `CoordinatedPursuitPolicy` (the name used by their earlier stand-in version of this
+# file). It is the same class, so their script runs unchanged with this baseline.
+CoordinatedPursuitPolicy = CoordinatedPursuit
