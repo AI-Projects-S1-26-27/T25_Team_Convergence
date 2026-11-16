@@ -6,27 +6,27 @@
   "summary": {
     "n": 200,
     "capture_rate": 1.0,
-    "mean_time_penalized": 35.755,
-    "median_time_captured": 31.0
+    "mean_time_penalized": 31.98,
+    "median_time_captured": 29.0
   },
   "results": [
     {
       "scenario": 0,
       "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
+      "steps_to_capture": 22,
+      "capture_step": 22
     },
     {
       "scenario": 1,
       "captured": true,
-      "steps_to_capture": 47,
-      "capture_step": 47
+      "steps_to_capture": 31,
+      "capture_step": 31
     },
     {
       "scenario": 2,
       "captured": true,
-      "steps_to_capture": 34,
-      "capture_step": 34
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 3,
@@ -37,32 +37,32 @@
     {
       "scenario": 4,
       "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
+      "steps_to_capture": 20,
+      "capture_step": 20
     },
     {
       "scenario": 5,
       "captured": true,
-      "steps_to_capture": 104,
-      "capture_step": 104
+      "steps_to_capture": 33,
+      "capture_step": 33
     },
     {
       "scenario": 6,
       "captured": true,
-      "steps_to_capture": 72,
-      "capture_step": 72
+      "steps_to_capture": 47,
+      "capture_step": 47
     },
     {
       "scenario": 7,
       "captured": true,
-      "steps_to_capture": 15,
-      "capture_step": 15
+      "steps_to_capture": 17,
+      "capture_step": 17
     },
     {
       "scenario": 8,
       "captured": true,
-      "steps_to_capture": 53,
-      "capture_step": 53
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 9,
@@ -73,14 +73,14 @@
     {
       "scenario": 10,
       "captured": true,
-      "steps_to_capture": 54,
-      "capture_step": 54
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 11,
       "captured": true,
-      "steps_to_capture": 50,
-      "capture_step": 50
+      "steps_to_capture": 48,
+      "capture_step": 48
     },
     {
       "scenario": 12,
@@ -91,20 +91,20 @@
     {
       "scenario": 13,
       "captured": true,
-      "steps_to_capture": 17,
-      "capture_step": 17
+      "steps_to_capture": 105,
+      "capture_step": 105
     },
     {
       "scenario": 14,
       "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
+      "steps_to_capture": 21,
+      "capture_step": 21
     },
     {
       "scenario": 15,
       "captured": true,
-      "steps_to_capture": 17,
-      "capture_step": 17
+      "steps_to_capture": 70,
+      "capture_step": 70
     },
     {
       "scenario": 16,
@@ -115,128 +115,128 @@
     {
       "scenario": 17,
       "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
-    },
-    {
-      "scenario": 18,
-      "captured": true,
-      "steps_to_capture": 40,
-      "capture_step": 40
-    },
-    {
-      "scenario": 19,
-      "captured": true,
-      "steps_to_capture": 41,
-      "capture_step": 41
-    },
-    {
-      "scenario": 20,
-      "captured": true,
-      "steps_to_capture": 20,
-      "capture_step": 20
-    },
-    {
-      "scenario": 21,
-      "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
-    },
-    {
-      "scenario": 22,
-      "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
-    },
-    {
-      "scenario": 23,
-      "captured": true,
-      "steps_to_capture": 63,
-      "capture_step": 63
-    },
-    {
-      "scenario": 24,
-      "captured": true,
-      "steps_to_capture": 57,
-      "capture_step": 57
-    },
-    {
-      "scenario": 25,
-      "captured": true,
-      "steps_to_capture": 45,
-      "capture_step": 45
-    },
-    {
-      "scenario": 26,
-      "captured": true,
-      "steps_to_capture": 22,
-      "capture_step": 22
-    },
-    {
-      "scenario": 27,
-      "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
-    },
-    {
-      "scenario": 28,
-      "captured": true,
-      "steps_to_capture": 57,
-      "capture_step": 57
-    },
-    {
-      "scenario": 29,
-      "captured": true,
       "steps_to_capture": 38,
       "capture_step": 38
     },
     {
-      "scenario": 30,
+      "scenario": 18,
       "captured": true,
-      "steps_to_capture": 41,
-      "capture_step": 41
+      "steps_to_capture": 32,
+      "capture_step": 32
     },
     {
-      "scenario": 31,
+      "scenario": 19,
       "captured": true,
-      "steps_to_capture": 51,
-      "capture_step": 51
+      "steps_to_capture": 24,
+      "capture_step": 24
     },
     {
-      "scenario": 32,
+      "scenario": 20,
       "captured": true,
-      "steps_to_capture": 37,
-      "capture_step": 37
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
-      "scenario": 33,
+      "scenario": 21,
       "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
+      "steps_to_capture": 14,
+      "capture_step": 14
     },
     {
-      "scenario": 34,
-      "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
-    },
-    {
-      "scenario": 35,
+      "scenario": 22,
       "captured": true,
       "steps_to_capture": 13,
       "capture_step": 13
     },
     {
+      "scenario": 23,
+      "captured": true,
+      "steps_to_capture": 61,
+      "capture_step": 61
+    },
+    {
+      "scenario": 24,
+      "captured": true,
+      "steps_to_capture": 21,
+      "capture_step": 21
+    },
+    {
+      "scenario": 25,
+      "captured": true,
+      "steps_to_capture": 28,
+      "capture_step": 28
+    },
+    {
+      "scenario": 26,
+      "captured": true,
+      "steps_to_capture": 23,
+      "capture_step": 23
+    },
+    {
+      "scenario": 27,
+      "captured": true,
+      "steps_to_capture": 30,
+      "capture_step": 30
+    },
+    {
+      "scenario": 28,
+      "captured": true,
+      "steps_to_capture": 47,
+      "capture_step": 47
+    },
+    {
+      "scenario": 29,
+      "captured": true,
+      "steps_to_capture": 6,
+      "capture_step": 6
+    },
+    {
+      "scenario": 30,
+      "captured": true,
+      "steps_to_capture": 49,
+      "capture_step": 49
+    },
+    {
+      "scenario": 31,
+      "captured": true,
+      "steps_to_capture": 38,
+      "capture_step": 38
+    },
+    {
+      "scenario": 32,
+      "captured": true,
+      "steps_to_capture": 22,
+      "capture_step": 22
+    },
+    {
+      "scenario": 33,
+      "captured": true,
+      "steps_to_capture": 18,
+      "capture_step": 18
+    },
+    {
+      "scenario": 34,
+      "captured": true,
+      "steps_to_capture": 16,
+      "capture_step": 16
+    },
+    {
+      "scenario": 35,
+      "captured": true,
+      "steps_to_capture": 12,
+      "capture_step": 12
+    },
+    {
       "scenario": 36,
       "captured": true,
-      "steps_to_capture": 35,
-      "capture_step": 35
+      "steps_to_capture": 16,
+      "capture_step": 16
     },
     {
       "scenario": 37,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 26,
+      "capture_step": 26
     },
     {
       "scenario": 38,
@@ -259,104 +259,104 @@
     {
       "scenario": 41,
       "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
+      "steps_to_capture": 4,
+      "capture_step": 4
     },
     {
       "scenario": 42,
       "captured": true,
-      "steps_to_capture": 43,
-      "capture_step": 43
+      "steps_to_capture": 31,
+      "capture_step": 31
     },
     {
       "scenario": 43,
       "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
+      "steps_to_capture": 50,
+      "capture_step": 50
     },
     {
       "scenario": 44,
+      "captured": true,
+      "steps_to_capture": 33,
+      "capture_step": 33
+    },
+    {
+      "scenario": 45,
+      "captured": true,
+      "steps_to_capture": 25,
+      "capture_step": 25
+    },
+    {
+      "scenario": 46,
       "captured": true,
       "steps_to_capture": 32,
       "capture_step": 32
     },
     {
-      "scenario": 45,
-      "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
-    },
-    {
-      "scenario": 46,
-      "captured": true,
-      "steps_to_capture": 20,
-      "capture_step": 20
-    },
-    {
       "scenario": 47,
       "captured": true,
-      "steps_to_capture": 41,
-      "capture_step": 41
+      "steps_to_capture": 19,
+      "capture_step": 19
     },
     {
       "scenario": 48,
       "captured": true,
-      "steps_to_capture": 60,
-      "capture_step": 60
+      "steps_to_capture": 30,
+      "capture_step": 30
     },
     {
       "scenario": 49,
       "captured": true,
-      "steps_to_capture": 41,
-      "capture_step": 41
+      "steps_to_capture": 11,
+      "capture_step": 11
     },
     {
       "scenario": 50,
       "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
+      "steps_to_capture": 24,
+      "capture_step": 24
     },
     {
       "scenario": 51,
       "captured": true,
-      "steps_to_capture": 79,
-      "capture_step": 79
+      "steps_to_capture": 31,
+      "capture_step": 31
     },
     {
       "scenario": 52,
       "captured": true,
-      "steps_to_capture": 62,
-      "capture_step": 62
+      "steps_to_capture": 58,
+      "capture_step": 58
     },
     {
       "scenario": 53,
       "captured": true,
-      "steps_to_capture": 84,
-      "capture_step": 84
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 54,
       "captured": true,
-      "steps_to_capture": 44,
-      "capture_step": 44
+      "steps_to_capture": 15,
+      "capture_step": 15
     },
     {
       "scenario": 55,
       "captured": true,
-      "steps_to_capture": 17,
-      "capture_step": 17
+      "steps_to_capture": 16,
+      "capture_step": 16
     },
     {
       "scenario": 56,
       "captured": true,
-      "steps_to_capture": 35,
-      "capture_step": 35
+      "steps_to_capture": 28,
+      "capture_step": 28
     },
     {
       "scenario": 57,
       "captured": true,
-      "steps_to_capture": 18,
-      "capture_step": 18
+      "steps_to_capture": 42,
+      "capture_step": 42
     },
     {
       "scenario": 58,
@@ -373,14 +373,14 @@
     {
       "scenario": 60,
       "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
+      "steps_to_capture": 46,
+      "capture_step": 46
     },
     {
       "scenario": 61,
       "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
+      "steps_to_capture": 33,
+      "capture_step": 33
     },
     {
       "scenario": 62,
@@ -391,14 +391,14 @@
     {
       "scenario": 63,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 39,
+      "capture_step": 39
     },
     {
       "scenario": 64,
       "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
+      "steps_to_capture": 59,
+      "capture_step": 59
     },
     {
       "scenario": 65,
@@ -409,44 +409,44 @@
     {
       "scenario": 66,
       "captured": true,
-      "steps_to_capture": 19,
-      "capture_step": 19
+      "steps_to_capture": 30,
+      "capture_step": 30
     },
     {
       "scenario": 67,
       "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
+      "steps_to_capture": 28,
+      "capture_step": 28
     },
     {
       "scenario": 68,
       "captured": true,
-      "steps_to_capture": 75,
-      "capture_step": 75
+      "steps_to_capture": 32,
+      "capture_step": 32
     },
     {
       "scenario": 69,
       "captured": true,
-      "steps_to_capture": 19,
-      "capture_step": 19
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 70,
       "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
+      "steps_to_capture": 38,
+      "capture_step": 38
     },
     {
       "scenario": 71,
       "captured": true,
-      "steps_to_capture": 36,
-      "capture_step": 36
+      "steps_to_capture": 17,
+      "capture_step": 17
     },
     {
       "scenario": 72,
       "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
+      "steps_to_capture": 21,
+      "capture_step": 21
     },
     {
       "scenario": 73,
@@ -457,26 +457,26 @@
     {
       "scenario": 74,
       "captured": true,
-      "steps_to_capture": 31,
-      "capture_step": 31
+      "steps_to_capture": 33,
+      "capture_step": 33
     },
     {
       "scenario": 75,
       "captured": true,
-      "steps_to_capture": 31,
-      "capture_step": 31
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 76,
       "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
+      "steps_to_capture": 18,
+      "capture_step": 18
     },
     {
       "scenario": 77,
       "captured": true,
-      "steps_to_capture": 47,
-      "capture_step": 47
+      "steps_to_capture": 15,
+      "capture_step": 15
     },
     {
       "scenario": 78,
@@ -487,158 +487,158 @@
     {
       "scenario": 79,
       "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
-    },
-    {
-      "scenario": 80,
-      "captured": true,
-      "steps_to_capture": 15,
-      "capture_step": 15
-    },
-    {
-      "scenario": 81,
-      "captured": true,
-      "steps_to_capture": 62,
-      "capture_step": 62
-    },
-    {
-      "scenario": 82,
-      "captured": true,
-      "steps_to_capture": 79,
-      "capture_step": 79
-    },
-    {
-      "scenario": 83,
-      "captured": true,
-      "steps_to_capture": 48,
-      "capture_step": 48
-    },
-    {
-      "scenario": 84,
-      "captured": true,
-      "steps_to_capture": 34,
-      "capture_step": 34
-    },
-    {
-      "scenario": 85,
-      "captured": true,
-      "steps_to_capture": 24,
-      "capture_step": 24
-    },
-    {
-      "scenario": 86,
-      "captured": true,
-      "steps_to_capture": 36,
-      "capture_step": 36
-    },
-    {
-      "scenario": 87,
-      "captured": true,
-      "steps_to_capture": 14,
-      "capture_step": 14
-    },
-    {
-      "scenario": 88,
-      "captured": true,
-      "steps_to_capture": 82,
-      "capture_step": 82
-    },
-    {
-      "scenario": 89,
-      "captured": true,
-      "steps_to_capture": 42,
-      "capture_step": 42
-    },
-    {
-      "scenario": 90,
-      "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
-    },
-    {
-      "scenario": 91,
-      "captured": true,
-      "steps_to_capture": 61,
-      "capture_step": 61
-    },
-    {
-      "scenario": 92,
-      "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
-    },
-    {
-      "scenario": 93,
-      "captured": true,
-      "steps_to_capture": 40,
-      "capture_step": 40
-    },
-    {
-      "scenario": 94,
-      "captured": true,
-      "steps_to_capture": 69,
-      "capture_step": 69
-    },
-    {
-      "scenario": 95,
-      "captured": true,
-      "steps_to_capture": 40,
-      "capture_step": 40
-    },
-    {
-      "scenario": 96,
-      "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
-    },
-    {
-      "scenario": 97,
-      "captured": true,
-      "steps_to_capture": 29,
-      "capture_step": 29
-    },
-    {
-      "scenario": 98,
-      "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
-    },
-    {
-      "scenario": 99,
-      "captured": true,
-      "steps_to_capture": 30,
-      "capture_step": 30
-    },
-    {
-      "scenario": 100,
-      "captured": true,
       "steps_to_capture": 18,
       "capture_step": 18
     },
     {
-      "scenario": 101,
+      "scenario": 80,
+      "captured": true,
+      "steps_to_capture": 19,
+      "capture_step": 19
+    },
+    {
+      "scenario": 81,
       "captured": true,
       "steps_to_capture": 20,
       "capture_step": 20
     },
     {
-      "scenario": 102,
+      "scenario": 82,
       "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
+      "steps_to_capture": 41,
+      "capture_step": 41
     },
     {
-      "scenario": 103,
+      "scenario": 83,
+      "captured": true,
+      "steps_to_capture": 22,
+      "capture_step": 22
+    },
+    {
+      "scenario": 84,
+      "captured": true,
+      "steps_to_capture": 58,
+      "capture_step": 58
+    },
+    {
+      "scenario": 85,
+      "captured": true,
+      "steps_to_capture": 25,
+      "capture_step": 25
+    },
+    {
+      "scenario": 86,
+      "captured": true,
+      "steps_to_capture": 27,
+      "capture_step": 27
+    },
+    {
+      "scenario": 87,
+      "captured": true,
+      "steps_to_capture": 15,
+      "capture_step": 15
+    },
+    {
+      "scenario": 88,
+      "captured": true,
+      "steps_to_capture": 26,
+      "capture_step": 26
+    },
+    {
+      "scenario": 89,
+      "captured": true,
+      "steps_to_capture": 22,
+      "capture_step": 22
+    },
+    {
+      "scenario": 90,
+      "captured": true,
+      "steps_to_capture": 30,
+      "capture_step": 30
+    },
+    {
+      "scenario": 91,
       "captured": true,
       "steps_to_capture": 28,
       "capture_step": 28
     },
     {
-      "scenario": 104,
+      "scenario": 92,
+      "captured": true,
+      "steps_to_capture": 30,
+      "capture_step": 30
+    },
+    {
+      "scenario": 93,
+      "captured": true,
+      "steps_to_capture": 36,
+      "capture_step": 36
+    },
+    {
+      "scenario": 94,
+      "captured": true,
+      "steps_to_capture": 29,
+      "capture_step": 29
+    },
+    {
+      "scenario": 95,
+      "captured": true,
+      "steps_to_capture": 61,
+      "capture_step": 61
+    },
+    {
+      "scenario": 96,
+      "captured": true,
+      "steps_to_capture": 39,
+      "capture_step": 39
+    },
+    {
+      "scenario": 97,
+      "captured": true,
+      "steps_to_capture": 32,
+      "capture_step": 32
+    },
+    {
+      "scenario": 98,
+      "captured": true,
+      "steps_to_capture": 45,
+      "capture_step": 45
+    },
+    {
+      "scenario": 99,
+      "captured": true,
+      "steps_to_capture": 33,
+      "capture_step": 33
+    },
+    {
+      "scenario": 100,
+      "captured": true,
+      "steps_to_capture": 57,
+      "capture_step": 57
+    },
+    {
+      "scenario": 101,
+      "captured": true,
+      "steps_to_capture": 18,
+      "capture_step": 18
+    },
+    {
+      "scenario": 102,
       "captured": true,
       "steps_to_capture": 26,
       "capture_step": 26
+    },
+    {
+      "scenario": 103,
+      "captured": true,
+      "steps_to_capture": 44,
+      "capture_step": 44
+    },
+    {
+      "scenario": 104,
+      "captured": true,
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 105,
@@ -649,14 +649,14 @@
     {
       "scenario": 106,
       "captured": true,
-      "steps_to_capture": 46,
-      "capture_step": 46
+      "steps_to_capture": 42,
+      "capture_step": 42
     },
     {
       "scenario": 107,
       "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
+      "steps_to_capture": 14,
+      "capture_step": 14
     },
     {
       "scenario": 108,
@@ -667,32 +667,32 @@
     {
       "scenario": 109,
       "captured": true,
-      "steps_to_capture": 34,
-      "capture_step": 34
-    },
-    {
-      "scenario": 110,
-      "captured": true,
-      "steps_to_capture": 58,
-      "capture_step": 58
-    },
-    {
-      "scenario": 111,
-      "captured": true,
-      "steps_to_capture": 43,
-      "capture_step": 43
-    },
-    {
-      "scenario": 112,
-      "captured": true,
       "steps_to_capture": 23,
       "capture_step": 23
     },
     {
+      "scenario": 110,
+      "captured": true,
+      "steps_to_capture": 61,
+      "capture_step": 61
+    },
+    {
+      "scenario": 111,
+      "captured": true,
+      "steps_to_capture": 21,
+      "capture_step": 21
+    },
+    {
+      "scenario": 112,
+      "captured": true,
+      "steps_to_capture": 28,
+      "capture_step": 28
+    },
+    {
       "scenario": 113,
       "captured": true,
-      "steps_to_capture": 22,
-      "capture_step": 22
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 114,
@@ -709,98 +709,98 @@
     {
       "scenario": 116,
       "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
+      "steps_to_capture": 11,
+      "capture_step": 11
     },
     {
       "scenario": 117,
       "captured": true,
-      "steps_to_capture": 14,
-      "capture_step": 14
+      "steps_to_capture": 57,
+      "capture_step": 57
     },
     {
       "scenario": 118,
       "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
+      "steps_to_capture": 63,
+      "capture_step": 63
     },
     {
       "scenario": 119,
       "captured": true,
-      "steps_to_capture": 9,
-      "capture_step": 9
+      "steps_to_capture": 48,
+      "capture_step": 48
     },
     {
       "scenario": 120,
       "captured": true,
-      "steps_to_capture": 36,
-      "capture_step": 36
+      "steps_to_capture": 18,
+      "capture_step": 18
     },
     {
       "scenario": 121,
       "captured": true,
-      "steps_to_capture": 44,
-      "capture_step": 44
+      "steps_to_capture": 72,
+      "capture_step": 72
     },
     {
       "scenario": 122,
       "captured": true,
-      "steps_to_capture": 12,
-      "capture_step": 12
+      "steps_to_capture": 63,
+      "capture_step": 63
     },
     {
       "scenario": 123,
       "captured": true,
-      "steps_to_capture": 31,
-      "capture_step": 31
+      "steps_to_capture": 35,
+      "capture_step": 35
     },
     {
       "scenario": 124,
       "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
+      "steps_to_capture": 57,
+      "capture_step": 57
     },
     {
       "scenario": 125,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 75,
+      "capture_step": 75
     },
     {
       "scenario": 126,
       "captured": true,
-      "steps_to_capture": 33,
-      "capture_step": 33
+      "steps_to_capture": 74,
+      "capture_step": 74
     },
     {
       "scenario": 127,
       "captured": true,
-      "steps_to_capture": 58,
-      "capture_step": 58
+      "steps_to_capture": 54,
+      "capture_step": 54
     },
     {
       "scenario": 128,
-      "captured": true,
-      "steps_to_capture": 90,
-      "capture_step": 90
-    },
-    {
-      "scenario": 129,
-      "captured": true,
-      "steps_to_capture": 16,
-      "capture_step": 16
-    },
-    {
-      "scenario": 130,
       "captured": true,
       "steps_to_capture": 22,
       "capture_step": 22
     },
     {
+      "scenario": 129,
+      "captured": true,
+      "steps_to_capture": 65,
+      "capture_step": 65
+    },
+    {
+      "scenario": 130,
+      "captured": true,
+      "steps_to_capture": 25,
+      "capture_step": 25
+    },
+    {
       "scenario": 131,
       "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
+      "steps_to_capture": 24,
+      "capture_step": 24
     },
     {
       "scenario": 132,
@@ -811,74 +811,74 @@
     {
       "scenario": 133,
       "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
-    },
-    {
-      "scenario": 134,
-      "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
-    },
-    {
-      "scenario": 135,
-      "captured": true,
-      "steps_to_capture": 51,
-      "capture_step": 51
-    },
-    {
-      "scenario": 136,
-      "captured": true,
-      "steps_to_capture": 53,
-      "capture_step": 53
-    },
-    {
-      "scenario": 137,
-      "captured": true,
-      "steps_to_capture": 21,
-      "capture_step": 21
-    },
-    {
-      "scenario": 138,
-      "captured": true,
-      "steps_to_capture": 87,
-      "capture_step": 87
-    },
-    {
-      "scenario": 139,
-      "captured": true,
-      "steps_to_capture": 62,
-      "capture_step": 62
-    },
-    {
-      "scenario": 140,
-      "captured": true,
       "steps_to_capture": 23,
       "capture_step": 23
     },
     {
-      "scenario": 141,
+      "scenario": 134,
       "captured": true,
-      "steps_to_capture": 65,
-      "capture_step": 65
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
-      "scenario": 142,
-      "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
-    },
-    {
-      "scenario": 143,
+      "scenario": 135,
       "captured": true,
       "steps_to_capture": 37,
       "capture_step": 37
     },
     {
+      "scenario": 136,
+      "captured": true,
+      "steps_to_capture": 44,
+      "capture_step": 44
+    },
+    {
+      "scenario": 137,
+      "captured": true,
+      "steps_to_capture": 43,
+      "capture_step": 43
+    },
+    {
+      "scenario": 138,
+      "captured": true,
+      "steps_to_capture": 18,
+      "capture_step": 18
+    },
+    {
+      "scenario": 139,
+      "captured": true,
+      "steps_to_capture": 15,
+      "capture_step": 15
+    },
+    {
+      "scenario": 140,
+      "captured": true,
+      "steps_to_capture": 20,
+      "capture_step": 20
+    },
+    {
+      "scenario": 141,
+      "captured": true,
+      "steps_to_capture": 37,
+      "capture_step": 37
+    },
+    {
+      "scenario": 142,
+      "captured": true,
+      "steps_to_capture": 22,
+      "capture_step": 22
+    },
+    {
+      "scenario": 143,
+      "captured": true,
+      "steps_to_capture": 23,
+      "capture_step": 23
+    },
+    {
       "scenario": 144,
       "captured": true,
-      "steps_to_capture": 51,
-      "capture_step": 51
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 145,
@@ -889,122 +889,122 @@
     {
       "scenario": 146,
       "captured": true,
-      "steps_to_capture": 49,
-      "capture_step": 49
+      "steps_to_capture": 25,
+      "capture_step": 25
     },
     {
       "scenario": 147,
       "captured": true,
-      "steps_to_capture": 49,
-      "capture_step": 49
+      "steps_to_capture": 57,
+      "capture_step": 57
     },
     {
       "scenario": 148,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 21,
+      "capture_step": 21
     },
     {
       "scenario": 149,
       "captured": true,
-      "steps_to_capture": 15,
-      "capture_step": 15
+      "steps_to_capture": 60,
+      "capture_step": 60
     },
     {
       "scenario": 150,
       "captured": true,
-      "steps_to_capture": 22,
-      "capture_step": 22
+      "steps_to_capture": 28,
+      "capture_step": 28
     },
     {
       "scenario": 151,
-      "captured": true,
-      "steps_to_capture": 17,
-      "capture_step": 17
-    },
-    {
-      "scenario": 152,
       "captured": true,
       "steps_to_capture": 36,
       "capture_step": 36
     },
     {
+      "scenario": 152,
+      "captured": true,
+      "steps_to_capture": 42,
+      "capture_step": 42
+    },
+    {
       "scenario": 153,
       "captured": true,
-      "steps_to_capture": 33,
-      "capture_step": 33
+      "steps_to_capture": 42,
+      "capture_step": 42
     },
     {
       "scenario": 154,
+      "captured": true,
+      "steps_to_capture": 46,
+      "capture_step": 46
+    },
+    {
+      "scenario": 155,
+      "captured": true,
+      "steps_to_capture": 20,
+      "capture_step": 20
+    },
+    {
+      "scenario": 156,
+      "captured": true,
+      "steps_to_capture": 40,
+      "capture_step": 40
+    },
+    {
+      "scenario": 157,
+      "captured": true,
+      "steps_to_capture": 14,
+      "capture_step": 14
+    },
+    {
+      "scenario": 158,
       "captured": true,
       "steps_to_capture": 32,
       "capture_step": 32
     },
     {
-      "scenario": 155,
+      "scenario": 159,
+      "captured": true,
+      "steps_to_capture": 9,
+      "capture_step": 9
+    },
+    {
+      "scenario": 160,
+      "captured": true,
+      "steps_to_capture": 74,
+      "capture_step": 74
+    },
+    {
+      "scenario": 161,
+      "captured": true,
+      "steps_to_capture": 25,
+      "capture_step": 25
+    },
+    {
+      "scenario": 162,
+      "captured": true,
+      "steps_to_capture": 30,
+      "capture_step": 30
+    },
+    {
+      "scenario": 163,
+      "captured": true,
+      "steps_to_capture": 20,
+      "capture_step": 20
+    },
+    {
+      "scenario": 164,
       "captured": true,
       "steps_to_capture": 29,
       "capture_step": 29
     },
     {
-      "scenario": 156,
-      "captured": true,
-      "steps_to_capture": 77,
-      "capture_step": 77
-    },
-    {
-      "scenario": 157,
-      "captured": true,
-      "steps_to_capture": 43,
-      "capture_step": 43
-    },
-    {
-      "scenario": 158,
-      "captured": true,
-      "steps_to_capture": 58,
-      "capture_step": 58
-    },
-    {
-      "scenario": 159,
-      "captured": true,
-      "steps_to_capture": 22,
-      "capture_step": 22
-    },
-    {
-      "scenario": 160,
-      "captured": true,
-      "steps_to_capture": 57,
-      "capture_step": 57
-    },
-    {
-      "scenario": 161,
-      "captured": true,
-      "steps_to_capture": 66,
-      "capture_step": 66
-    },
-    {
-      "scenario": 162,
-      "captured": true,
-      "steps_to_capture": 57,
-      "capture_step": 57
-    },
-    {
-      "scenario": 163,
-      "captured": true,
-      "steps_to_capture": 50,
-      "capture_step": 50
-    },
-    {
-      "scenario": 164,
-      "captured": true,
-      "steps_to_capture": 24,
-      "capture_step": 24
-    },
-    {
       "scenario": 165,
       "captured": true,
-      "steps_to_capture": 39,
-      "capture_step": 39
+      "steps_to_capture": 52,
+      "capture_step": 52
     },
     {
       "scenario": 166,
@@ -1015,38 +1015,38 @@
     {
       "scenario": 167,
       "captured": true,
-      "steps_to_capture": 55,
-      "capture_step": 55
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 168,
       "captured": true,
-      "steps_to_capture": 43,
-      "capture_step": 43
+      "steps_to_capture": 22,
+      "capture_step": 22
     },
     {
       "scenario": 169,
       "captured": true,
-      "steps_to_capture": 17,
-      "capture_step": 17
+      "steps_to_capture": 39,
+      "capture_step": 39
     },
     {
       "scenario": 170,
       "captured": true,
-      "steps_to_capture": 37,
-      "capture_step": 37
+      "steps_to_capture": 55,
+      "capture_step": 55
     },
     {
       "scenario": 171,
       "captured": true,
-      "steps_to_capture": 48,
-      "capture_step": 48
+      "steps_to_capture": 40,
+      "capture_step": 40
     },
     {
       "scenario": 172,
       "captured": true,
-      "steps_to_capture": 27,
-      "capture_step": 27
+      "steps_to_capture": 47,
+      "capture_step": 47
     },
     {
       "scenario": 173,
@@ -1057,26 +1057,26 @@
     {
       "scenario": 174,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 29,
+      "capture_step": 29
     },
     {
       "scenario": 175,
       "captured": true,
-      "steps_to_capture": 10,
-      "capture_step": 10
+      "steps_to_capture": 15,
+      "capture_step": 15
     },
     {
       "scenario": 176,
       "captured": true,
-      "steps_to_capture": 32,
-      "capture_step": 32
+      "steps_to_capture": 81,
+      "capture_step": 81
     },
     {
       "scenario": 177,
       "captured": true,
-      "steps_to_capture": 69,
-      "capture_step": 69
+      "steps_to_capture": 22,
+      "capture_step": 22
     },
     {
       "scenario": 178,
@@ -1093,38 +1093,38 @@
     {
       "scenario": 180,
       "captured": true,
-      "steps_to_capture": 39,
-      "capture_step": 39
+      "steps_to_capture": 34,
+      "capture_step": 34
     },
     {
       "scenario": 181,
       "captured": true,
-      "steps_to_capture": 47,
-      "capture_step": 47
+      "steps_to_capture": 27,
+      "capture_step": 27
     },
     {
       "scenario": 182,
       "captured": true,
-      "steps_to_capture": 39,
-      "capture_step": 39
+      "steps_to_capture": 41,
+      "capture_step": 41
     },
     {
       "scenario": 183,
+      "captured": true,
+      "steps_to_capture": 33,
+      "capture_step": 33
+    },
+    {
+      "scenario": 184,
       "captured": true,
       "steps_to_capture": 28,
       "capture_step": 28
     },
     {
-      "scenario": 184,
-      "captured": true,
-      "steps_to_capture": 52,
-      "capture_step": 52
-    },
-    {
       "scenario": 185,
       "captured": true,
-      "steps_to_capture": 35,
-      "capture_step": 35
+      "steps_to_capture": 23,
+      "capture_step": 23
     },
     {
       "scenario": 186,
@@ -1135,14 +1135,14 @@
     {
       "scenario": 187,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 24,
+      "capture_step": 24
     },
     {
       "scenario": 188,
       "captured": true,
-      "steps_to_capture": 26,
-      "capture_step": 26
+      "steps_to_capture": 24,
+      "capture_step": 24
     },
     {
       "scenario": 189,
@@ -1153,26 +1153,26 @@
     {
       "scenario": 190,
       "captured": true,
-      "steps_to_capture": 28,
-      "capture_step": 28
+      "steps_to_capture": 19,
+      "capture_step": 19
     },
     {
       "scenario": 191,
       "captured": true,
-      "steps_to_capture": 50,
-      "capture_step": 50
+      "steps_to_capture": 35,
+      "capture_step": 35
     },
     {
       "scenario": 192,
       "captured": true,
-      "steps_to_capture": 62,
-      "capture_step": 62
+      "steps_to_capture": 35,
+      "capture_step": 35
     },
     {
       "scenario": 193,
       "captured": true,
-      "steps_to_capture": 74,
-      "capture_step": 74
+      "steps_to_capture": 38,
+      "capture_step": 38
     },
     {
       "scenario": 194,
@@ -1189,20 +1189,20 @@
     {
       "scenario": 196,
       "captured": true,
-      "steps_to_capture": 23,
-      "capture_step": 23
+      "steps_to_capture": 33,
+      "capture_step": 33
     },
     {
       "scenario": 197,
       "captured": true,
-      "steps_to_capture": 12,
-      "capture_step": 12
+      "steps_to_capture": 31,
+      "capture_step": 31
     },
     {
       "scenario": 198,
       "captured": true,
-      "steps_to_capture": 22,
-      "capture_step": 22
+      "steps_to_capture": 18,
+      "capture_step": 18
     },
     {
       "scenario": 199,
