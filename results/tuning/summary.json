@@ -1,0 +1,58 @@
+{
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "selection_metric": "val_success_last3 (validation scenarios only)",
+  "settings": {
+    "baseline_10k_decay0.8": {
+      "episodes": 10000,
+      "eps_decay_frac": 0.8,
+      "val_success_last3": 0.7533333333333333,
+      "val_success_best": 0.9333333333333332,
+      "val_mean_time_last3": 155.32222222222222,
+      "per_seed_last3": [
+        0.6533333333333333,
+        0.7799999999999999,
+        0.8266666666666665
+      ]
+    },
+    "longer_30k_decay0.8": {
+      "episodes": 30000,
+      "eps_decay_frac": 0.8,
+      "val_success_last3": 0.9622222222222222,
+      "val_success_best": 0.9933333333333333,
+      "val_mean_time_last3": 89.07555555555557,
+      "per_seed_last3": [
+        0.9866666666666667,
+        0.9066666666666666,
+        0.9933333333333333
+      ]
+    },
+    "faster_10k_decay0.4": {
+      "episodes": 10000,
+      "eps_decay_frac": 0.4,
+      "val_success_last3": 0.8066666666666666,
+      "val_success_best": 0.9933333333333333,
+      "val_mean_time_last3": 146.87333333333333,
+      "per_seed_last3": [
+        0.9333333333333332,
+        0.5533333333333333,
+        0.9333333333333332
+      ]
+    },
+    "both_30k_decay0.4": {
+      "episodes": 30000,
+      "eps_decay_frac": 0.4,
+      "val_success_last3": 0.8888888888888888,
+      "val_success_best": 1.0,
+      "val_mean_time_last3": 116.35333333333335,
+      "per_seed_last3": [
+        0.94,
+        0.9266666666666666,
+        0.7999999999999999
+      ]
+    }
+  }
+}

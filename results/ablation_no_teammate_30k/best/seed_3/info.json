@@ -1,0 +1,14 @@
+{
+  "seed": 3,
+  "run_name": "ablation_no_teammate_30k",
+  "obs": "no_teammate",
+  "shaped": true,
+  "episodes": 30000,
+  "best_episode": 27000,
+  "best_val_success_rate": 1.0,
+  "best_val_mean_time": 39.32,
+  "alpha": 0.2,
+  "gamma": 0.99,
+  "eps_decay_frac": 0.8,
+  "train_seconds": 336.8
+}

@@ -25,3 +25,4 @@ results/*/checkpoints/
 # IDEs
 .vscode/
 .idea/
+results/**/checkpoints/
