@@ -66,6 +66,7 @@ def train(
     checkpoint_interval: int = config.CHECKPOINT_INTERVAL,
     alpha: float = config.ALPHA,
     gamma: float = config.GAMMA,
+    eps_decay_frac: float = config.EPS_DECAY_FRAC,
     results_dir: Optional[str] = None,
     val_path: str = VAL_PATH,
     verbose: bool = True,
@@ -105,7 +106,7 @@ def train(
         )
 
         for ep in range(episodes):
-            epsilon = get_epsilon(ep, episodes)
+            epsilon = get_epsilon(ep, episodes, decay_frac=eps_decay_frac)
             obs = env.reset()
             states = encode_team(obs)
             done = False
@@ -136,7 +137,7 @@ def train(
 
             done_eps = ep + 1
             if done_eps % checkpoint_interval == 0 or done_eps == episodes:
-                eps_now = get_epsilon(done_eps, episodes)
+                eps_now = get_epsilon(done_eps, episodes, decay_frac=eps_decay_frac)
                 val = summarize(evaluate(team, val_scenarios))
                 visited = int(np.mean([a.visited_states() for a in agents]))
                 writer.writerow(
@@ -170,7 +171,7 @@ def train(
                 "seed": seed, "run_name": run_name, "obs": obs_name, "shaped": shaped,
                 "episodes": episodes, "best_episode": best["episode"],
                 "best_val_success_rate": best["rate"], "best_val_mean_time": best["time"],
-                "alpha": alpha, "gamma": gamma, "train_seconds": round(seconds, 1),
+                "alpha": alpha, "gamma": gamma, "eps_decay_frac": eps_decay_frac, "train_seconds": round(seconds, 1),
             },
             f, indent=2,
         )
@@ -192,6 +193,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--checkpoint-interval", type=int, default=config.CHECKPOINT_INTERVAL)
     p.add_argument("--alpha", type=float, default=config.ALPHA)
     p.add_argument("--gamma", type=float, default=config.GAMMA)
+    p.add_argument("--eps-decay-frac", type=float, default=config.EPS_DECAY_FRAC,
+                   help="fraction of training over which epsilon decays linearly (default 0.8)")
     p.add_argument("--results-dir", default=None)
     p.add_argument("--quiet", action="store_true")
     return p
@@ -212,7 +215,7 @@ def main(argv=None) -> None:
         seed=args.seed, shaped=shaped, obs_name=args.obs,
         run_name=args.run_name or default_run_name(args.obs, shaped),
         episodes=args.episodes, checkpoint_interval=args.checkpoint_interval,
-        alpha=args.alpha, gamma=args.gamma, results_dir=args.results_dir, verbose=not args.quiet,
+        alpha=args.alpha, gamma=args.gamma, eps_decay_frac=args.eps_decay_frac, results_dir=args.results_dir, verbose=not args.quiet,
     )
 
 

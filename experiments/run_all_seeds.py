@@ -39,6 +39,7 @@ def main(argv=None) -> None:
     p.add_argument("--run-name", default=None)
     p.add_argument("--episodes", type=int, default=config.TOTAL_EPISODES)
     p.add_argument("--checkpoint-interval", type=int, default=config.CHECKPOINT_INTERVAL)
+    p.add_argument("--eps-decay-frac", type=float, default=config.EPS_DECAY_FRAC)
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     p.add_argument("--results-dir", default=None)
     args = p.parse_args(argv)
@@ -47,7 +48,7 @@ def main(argv=None) -> None:
     run_name = args.run_name or default_run_name(args.obs, shaped)
     jobs = [
         dict(seed=s, shaped=shaped, obs_name=args.obs, run_name=run_name, episodes=args.episodes,
-             checkpoint_interval=args.checkpoint_interval, results_dir=args.results_dir, verbose=False)
+             checkpoint_interval=args.checkpoint_interval, eps_decay_frac=args.eps_decay_frac, results_dir=args.results_dir, verbose=False)
         for s in args.seeds
     ]
     print(f"Training {len(jobs)} seeds for '{run_name}' with {args.workers} workers...", flush=True)

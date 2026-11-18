@@ -1,0 +1,14 @@
+{
+  "seed": 9,
+  "run_name": "full_30k",
+  "obs": "full",
+  "shaped": true,
+  "episodes": 30000,
+  "best_episode": 27000,
+  "best_val_success_rate": 0.98,
+  "best_val_mean_time": 79.14,
+  "alpha": 0.2,
+  "gamma": 0.99,
+  "eps_decay_frac": 0.8,
+  "train_seconds": 822.8
+}
