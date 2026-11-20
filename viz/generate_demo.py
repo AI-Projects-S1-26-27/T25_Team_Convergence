@@ -73,11 +73,11 @@ def load_evaluation_data() -> Tuple[Dict, Dict]:
 
 def auto_select_scenarios(learned_results: List[Dict], baseline_data: Dict) -> Dict[str, int]:
     """
-    Select representative scenario indices:
+    Select representative scenario indices dynamically:
     1. Fastest capture (best)
     2. Median capture (typical)
     3. Slowest successful capture (worst)
-    4. Timeout failure (failure case)
+    4. Timeout failure (failure case, or longest chase if 100% captured)
     5. Coordinated flank / interception win (clear advantage over CoordinatedPursuit)
     6. Direct pursuit comparison win
     """
@@ -97,11 +97,10 @@ def auto_select_scenarios(learned_results: List[Dict], baseline_data: Dict) -> D
     typical_r = sorted_caps[len(sorted_caps) // 2]
     typical_sc = typical_r["scenario"]
 
-    # 4. Timeout failure
-    timeout_sc = timeouts[0]["scenario"] if timeouts else 27
+    # 4. Timeout failure (or fallback to hardest/slowest chase)
+    timeout_sc = timeouts[0]["scenario"] if timeouts else worst_sc
 
-    # 5. Clear flanking win against Coordinated Pursuit
-    # Find scenarios where Learned beat CoordinatedPursuit by the widest margin
+    # 5. Clear flanking win against Coordinated Pursuit (maximum advantage)
     cp_results = {r["scenario"]: r["steps_to_capture"] for r in baseline_data["coordinated_pursuit"]}
     flank_candidates = [
         r for r in captured
@@ -111,15 +110,19 @@ def auto_select_scenarios(learned_results: List[Dict], baseline_data: Dict) -> D
         flank_r = max(flank_candidates, key=lambda r: cp_results[r["scenario"]] - r["steps_to_capture"])
         flank_sc = flank_r["scenario"]
     else:
-        flank_sc = 122
+        flank_sc = best_sc
 
-    # 6. Direct pursuit comparison win
+    # 6. Direct pursuit comparison win (maximum advantage)
     dp_results = {r["scenario"]: r["steps_to_capture"] for r in baseline_data["direct_pursuit"]}
     dp_candidates = [
         r for r in captured
-        if r["scenario"] in dp_results and dp_results[r["scenario"]] > r["steps_to_capture"] + 30
+        if r["scenario"] in dp_results and dp_results[r["scenario"]] > r["steps_to_capture"]
     ]
-    dp_sc = dp_candidates[0]["scenario"] if dp_candidates else 13
+    if dp_candidates:
+        dp_r = max(dp_candidates, key=lambda r: dp_results[r["scenario"]] - r["steps_to_capture"])
+        dp_sc = dp_r["scenario"]
+    else:
+        dp_sc = best_sc
 
     return {
         "best": best_sc,
@@ -129,6 +132,19 @@ def auto_select_scenarios(learned_results: List[Dict], baseline_data: Dict) -> D
         "flank": flank_sc,
         "direct_comp": dp_sc,
     }
+
+
+def _stride_sync(traj_l: list, traj_r: list, max_len: int = 120, stride: int = 3) -> Tuple[list, list]:
+    """Stride both trajectories together if episode is long to optimize GIF render time and file size."""
+    if max(len(traj_l), len(traj_r)) > max_len:
+        sl = traj_l[::stride]
+        if traj_l[-1] != sl[-1]:
+            sl.append(traj_l[-1])
+        sr = traj_r[::stride]
+        if traj_r[-1] != sr[-1]:
+            sr.append(traj_r[-1])
+        return sl, sr
+    return traj_l, traj_r
 
 
 def generate_all_demo_gifs() -> List[Tuple[str, int]]:
@@ -160,110 +176,114 @@ def generate_all_demo_gifs() -> List[Tuple[str, int]]:
 
     generated = []
 
-    # 1. best.gif (Fastest capture: Scenario 21)
+    # 1. best.gif (Fastest capture)
     sc_idx = selection["best"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("coordinated_pursuit", sc_idx)
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
     out_path = os.path.join(GIFS_DIR, "best.gif")
-    print(f"\n[1/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    print(f"\n[1/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
         traj_learned, traj_baseline,
-        label_l="Learned RL (Fastest)",
-        label_r="Coordinated Pursuit",
+        label_l=f"Learned RL ({steps_l} steps)",
+        label_r=f"Coordinated Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=4,
     )
     generated.append((out_path, os.path.getsize(out_path)))
 
-    # 2. typical.gif (Median capture: Scenario 26)
+    # 2. typical.gif (Median capture)
     sc_idx = selection["typical"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("coordinated_pursuit", sc_idx)
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
     out_path = os.path.join(GIFS_DIR, "typical.gif")
-    print(f"[2/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    print(f"[2/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
         traj_learned, traj_baseline,
-        label_l="Learned RL (Median)",
-        label_r="Coordinated Pursuit",
+        label_l=f"Learned RL ({steps_l} steps)",
+        label_r=f"Coordinated Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=6,
     )
     generated.append((out_path, os.path.getsize(out_path)))
 
-    # 3. worst.gif (Slowest successful capture: Scenario 74)
+    # 3. worst.gif (Slowest successful capture)
     sc_idx = selection["worst"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("coordinated_pursuit", sc_idx)
-    # Stride by 3 to keep GIF size and duration reasonable (approx 98 frames)
-    stride_learned = traj_learned[::3]
-    if traj_learned[-1] != stride_learned[-1]:
-        stride_learned.append(traj_learned[-1])
-    stride_baseline = traj_baseline[::3]
-    if traj_baseline[-1] != stride_baseline[-1]:
-        stride_baseline.append(traj_baseline[-1])
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
+    s_learned, s_baseline = _stride_sync(traj_learned, traj_baseline, max_len=120, stride=3)
     out_path = os.path.join(GIFS_DIR, "worst.gif")
-    print(f"[3/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    print(f"[3/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
-        stride_learned, stride_baseline,
-        label_l="Learned RL (Slowest)",
-        label_r="Coordinated Pursuit",
+        s_learned, s_baseline,
+        label_l=f"Learned RL ({steps_l} steps)",
+        label_r=f"Coordinated Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=6,
     )
     generated.append((out_path, os.path.getsize(out_path)))
 
-    # 4. timeout_failure.gif (300-step failure case: Scenario 27)
+    # 4. timeout_failure.gif (300-step failure case or longest chase)
     sc_idx = selection["timeout"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("coordinated_pursuit", sc_idx)
-    stride_learned = traj_learned[::3]
-    if traj_learned[-1] != stride_learned[-1]:
-        stride_learned.append(traj_learned[-1])
-    stride_baseline = traj_baseline[::3]
-    if traj_baseline[-1] != stride_baseline[-1]:
-        stride_baseline.append(traj_baseline[-1])
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
+    s_learned, s_baseline = _stride_sync(traj_learned, traj_baseline, max_len=120, stride=3)
     out_path = os.path.join(GIFS_DIR, "timeout_failure.gif")
-    print(f"[4/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    lbl_l = f"Learned RL (Timeout: {steps_l} steps)" if steps_l >= config.MAX_STEPS else f"Learned RL ({steps_l} steps)"
+    print(f"[4/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
-        stride_learned, stride_baseline,
-        label_l="Learned RL (Timeout Failure)",
-        label_r="Coordinated Pursuit (Captured)",
+        s_learned, s_baseline,
+        label_l=lbl_l,
+        label_r=f"Coordinated Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=6,
     )
     generated.append((out_path, os.path.getsize(out_path)))
 
-    # 5. coordinated_flank_demo.gif (Flanking win: Scenario 122)
+    # 5. coordinated_flank_demo.gif (Flanking win)
     sc_idx = selection["flank"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("coordinated_pursuit", sc_idx)
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
+    s_learned, s_baseline = _stride_sync(traj_learned, traj_baseline, max_len=120, stride=2)
     out_path = os.path.join(GIFS_DIR, "coordinated_flank_demo.gif")
-    print(f"[5/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    print(f"[5/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
-        traj_learned, traj_baseline,
-        label_l="Learned RL (Flank Win: 22 steps)",
-        label_r="Coordinated Pursuit (63 steps)",
+        s_learned, s_baseline,
+        label_l=f"Learned RL ({steps_l} steps)",
+        label_r=f"Coordinated Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=5,
     )
     generated.append((out_path, os.path.getsize(out_path)))
 
-    # 6. learned_vs_direct_pursuit.gif (Direct pursuit comparison: Scenario 13)
+    # 6. learned_vs_direct_pursuit.gif (Direct pursuit comparison)
     sc_idx = selection["direct_comp"]
     sc = test_scenarios[sc_idx]
     traj_learned = run_scenario(learned_policy, sc, record=True)["trajectory"]
     traj_baseline = get_baseline_traj("direct_pursuit", sc_idx)
+    steps_l = len(traj_learned) - 1
+    steps_r = len(traj_baseline) - 1
+    s_learned, s_baseline = _stride_sync(traj_learned, traj_baseline, max_len=120, stride=2)
     out_path = os.path.join(GIFS_DIR, "learned_vs_direct_pursuit.gif")
-    print(f"[6/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx})...")
+    print(f"[6/6] Generating {os.path.basename(out_path)} (Scenario {sc_idx}: {steps_l} vs {steps_r} steps)...")
     side_by_side_replay(
-        traj_learned, traj_baseline,
-        label_l="Learned RL (43 steps)",
-        label_r="Direct Pursuit (107 steps)",
+        s_learned, s_baseline,
+        label_l=f"Learned RL ({steps_l} steps)",
+        label_r=f"Direct Pursuit ({steps_r} steps)",
         filename=out_path,
         fps=5,
     )
